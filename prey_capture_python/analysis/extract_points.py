@@ -1,6 +1,27 @@
 import pandas as pd
 import numpy as np
 
+# from dataclasses import dataclass
+# from typing import List, Literal
+# from pathlib import Path
+#
+# @dataclass
+# class Position:
+#     x: List[int]
+#     y: List[int]
+#     p: List[float]
+#
+# @dataclass
+# class Track:
+#     positions: List[Position]
+#     animal: Literal['mouse', 'cricket']
+#
+#     @classmethod
+#     def from_dlc(cls, file:Path) -> Track:
+#         ...
+#
+# track = Track.from_dlc('file.csv')
+
 def extract_points(file, bodyparts, fr=200, pix2cm=15.8, thresh=0.7 ):
     '''
     function to extract mouse and cricket xy positions from DLC output csv
@@ -17,9 +38,9 @@ def extract_points(file, bodyparts, fr=200, pix2cm=15.8, thresh=0.7 ):
 
 
     Returns:
-        mouse_xy: xy coordinates for the mouse across the trial
-        cricket_xy: xy coordinates for the cricket across trial, cricket_xy is filtered to remove points with low likelihood
-        cricket_p: likelihood values of cricket points
+        mouse_xy (ndarray): xy coordinates for the mouse across the trial
+        cricket_xy (ndarray): xy coordinates for the cricket across trial, cricket_xy is filtered to remove points with low likelihood
+        cricket_p (ndarray): likelihood values of cricket points
 
     '''
     #set the constant values that will be used throughout
