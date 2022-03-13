@@ -1,4 +1,11 @@
-def geometries(cricket_xy, mouse_xy, rear_xy, lear_xy, fr=200):
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy import interpolate
+from scipy import signal
+
+def geometries(cricket_xy, mouse_xy, rear_xy, lear_xy, headbase_xy, fr=200):
     '''
     function to calculate geometric variables from DLC points
     these geometries can then be used for metrics such as time to capture
@@ -47,14 +54,29 @@ def geometries(cricket_xy, mouse_xy, rear_xy, lear_xy, fr=200):
     #calculate azimuth
     #right now goes from -180 to 180 to show the direction, but this can cause large jumps in the plotting
     #could shift it to just going from 0 to 180 and indicate which direction the mouse is some other way
-    mouse_az = np.arctan2((cricket_xy[1] - mouse_xy[1]),(cricket_xy[0] - mouse_xy[0]))*180/np.pi
-    head_az = np.arctan2((rear_xy[1] - lear_xy[1]),(rear_xy[0] - lear_xy[0]))*180/np.pi -90
-    az = mouse_az-head_az
-    az = np.mod(az+180,360)-180
+    #az seems to be shifted by 180 degrees, throwing off approach detection
+    # mouse_az = (np.arctan2((cricket_xy[1] - mouse_xy[1]),(cricket_xy[0] - mouse_xy[0]))*180)/np.pi
+    # head_az = ((np.arctan2((rear_xy[1] - lear_xy[1]),(rear_xy[0] - lear_xy[0]))*180)/np.pi) -90
+    # az = mouse_az-head_az
+    # az = np.mod(az+180,360)-180
+    # if np.sum(~np.isnan(az))>0:
+    #     azOld = az
+    #     ind = np.arange(0,len(az))
+    #     interp = interpolate.interp1d(ind[~np.isnan(az)], az[~np.isnan(az)],bounds_error=False, fill_value=np.nan )
+    #     az = interp(ind)
+
+    #mike has a different way of calculating azimuth, try that instead
+    #a=centerofmass to nose distance; b=center of mass to cricket distance, c=nose to to cricket distance
+    #az=acosd(a^2+b^2-c^2)/2ab
+    a=np.sqrt(np.square((mouse_xy[0]-headbase_xy[0]))+np.square((mouse_xy[1]-headbase_xy[1])))
+    b=np.sqrt(np.square((headbase_xy[0]-cricket_xy[0]))+np.square((headbase_xy[1]-cricket_xy[1])))
+    c=np.sqrt(np.square((mouse_xy[0]-cricket_xy[0]))+np.square((mouse_xy[1]-cricket_xy[1])))
+    az=np.arccos((np.square(a)+np.square(b)-np.square(c))/(2*a*b))
     if np.sum(~np.isnan(az))>0:
         azOld = az
         ind = np.arange(0,len(az))
         interp = interpolate.interp1d(ind[~np.isnan(az)], az[~np.isnan(az)],bounds_error=False, fill_value=np.nan )
         az = interp(ind)
+        az=(az*180)/np.pi
 
     return dist, mouse_spd, cricket_spd, az
