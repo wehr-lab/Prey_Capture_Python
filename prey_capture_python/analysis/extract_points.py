@@ -38,9 +38,9 @@ def extract_points(file, bodyparts, fr=200, pix2cm=15.8, thresh=0.7 ):
 
 
     Returns:
-        mouse_xy (ndarray): xy coordinates for the mouse across the trial
-        cricket_xy (ndarray): xy coordinates for the cricket across trial, cricket_xy is filtered to remove points with low likelihood
-        cricket_p (ndarray): likelihood values of cricket points
+        mouse_xy (:class:`numpy.ndarray`): xy coordinates for the mouse across the trial
+        cricket_xy (:class:`numpy.ndarray`): xy coordinates for the cricket across trial, cricket_xy is filtered to remove points with low likelihood
+        cricket_p (:class:`numpy.ndarray`): likelihood values of cricket points
 
     '''
     #set the constant values that will be used throughout

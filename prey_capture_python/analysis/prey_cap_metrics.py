@@ -28,11 +28,11 @@ def preycap_metrics(cricket_xy, cricket_p, range, mouse_spd, az, fr=200, oldmode
         decent first pass look at if there are differences between conditions
 
         Arguments:
-            cricket_xy (ndarray): thresholded cricket xy coordinates
-            cricket_p (ndarray): cricket likelihoods
-            range (ndarray): distance between mouse and cricket
-            mouse_spd (ndarray): mouse speed (not velocity)
-            az (ndarray): angle between mouse's head and cricket
+            cricket_xy (:class:`numpy.ndarray`): thresholded cricket xy coordinates
+            cricket_p (:class:`numpy.ndarray`): cricket likelihoods
+            range (:class:`numpy.ndarray`): distance between mouse and cricket
+            mouse_spd (:class:`numpy.ndarray`): mouse speed (not velocity)
+            az (:class:`numpy.ndarray`): angle between mouse's head and cricket
             fr (int): framerate of videos, default=200
             oldmodel (boolean): flag to mark cricket likelihood is bad, default=False
 
