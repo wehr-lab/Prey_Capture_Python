@@ -1,4 +1,7 @@
-def extract_points(file, bodyparts, fr=200, pix2cm=14.5, thresh=0.7 ):
+import pandas as pd
+import numpy as np
+
+def extract_points(file, bodyparts, fr=200, pix2cm=15.8, thresh=0.7 ):
     '''
     function to extract mouse and cricket xy positions from DLC output csv
     will also get the likelihood values for cricket positions
@@ -35,13 +38,17 @@ def extract_points(file, bodyparts, fr=200, pix2cm=14.5, thresh=0.7 ):
     rear_xy=np.asarray([rear_x,rear_y])
     lear_xy=np.asarray([lear_x,lear_y])
 
+    headbase_x=data[bodyparts[4],'x'].to_numpy()
+    headbase_y=data[bodyparts[4],'y'].to_numpy()
+    headbase_xy=np.asarray([headbase_x,headbase_y])/pix2cm
+
+
     mouse_xy=0.5*(rear_xy+lear_xy)/pix2cm
 
     #extract cricket likelihood and xy coordinates, same indexing issue
-    print(thresh)
     cricket_p=(data[bodyparts[2],'likelihood'].to_numpy()+data[bodyparts[3],'likelihood'].to_numpy())/2
-    cricket_x=(data[bodyparts[2],'x'].to_numpy()+data[bodyparts[3],'x'].to_numpy())/2*pix2cm
-    cricket_y=(data[bodyparts[2],'y'].to_numpy()+data[bodyparts[3],'y'].to_numpy())/2*pix2cm
+    cricket_x=(data[bodyparts[2],'x'].to_numpy()+data[bodyparts[3],'x'].to_numpy())/(2*pix2cm)
+    cricket_y=(data[bodyparts[2],'y'].to_numpy()+data[bodyparts[3],'y'].to_numpy())/(2*pix2cm)
 
     thresh_cricket_x=cricket_x.copy()
     thresh_cricket_x[cricket_p<thresh]=np.nan
@@ -50,4 +57,4 @@ def extract_points(file, bodyparts, fr=200, pix2cm=14.5, thresh=0.7 ):
 
     cricket_xy=[thresh_cricket_x, thresh_cricket_y]
 
-    return mouse_xy, cricket_p, cricket_xy, rear_xy, lear_xy
+    return mouse_xy, cricket_p, cricket_xy, rear_xy, lear_xy, headbase_xy
