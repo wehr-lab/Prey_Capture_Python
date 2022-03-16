@@ -21,6 +21,11 @@ import numpy as np
 #         ...
 #
 # track = Track.from_dlc('file.csv')
+def getmidpoint(pt1,pt2):
+    '''
+    '''
+    midpoint=0.5*(pt1+pt2)
+    return midpoint
 
 def extract_points(file, bodyparts, fr=200, pix2cm=15.8, thresh=0.7 ):
     '''
@@ -33,7 +38,7 @@ def extract_points(file, bodyparts, fr=200, pix2cm=15.8, thresh=0.7 ):
         bodyparts (list): list of the bodypart labels from DLC you need
             added as an input since names vary across models
         fr (int): framerate of videos, default=200
-        pix2cm (int): conversion from pixels to cm, default=14.5 (needs to be checked)
+        pix2cm (int): conversion from pixels to cm, default=15.8 (needs to be checked)
         thresh (int): threshold for likelihood values, default=0.7
 
 
@@ -64,10 +69,12 @@ def extract_points(file, bodyparts, fr=200, pix2cm=15.8, thresh=0.7 ):
     headbase_xy=np.asarray([headbase_x,headbase_y])/pix2cm
 
 
-    mouse_xy=0.5*(rear_xy+lear_xy)/pix2cm
+    mouse_xy=getmidpoint(rear_xy,lear_xy)/pix2cm
 
     #extract cricket likelihood and xy coordinates, same indexing issue
+    #average function?
     cricket_p=(data[bodyparts[2],'likelihood'].to_numpy()+data[bodyparts[3],'likelihood'].to_numpy())/2
+    #add pvalues to the same array as xy
     cricket_x=(data[bodyparts[2],'x'].to_numpy()+data[bodyparts[3],'x'].to_numpy())/(2*pix2cm)
     cricket_y=(data[bodyparts[2],'y'].to_numpy()+data[bodyparts[3],'y'].to_numpy())/(2*pix2cm)
 
