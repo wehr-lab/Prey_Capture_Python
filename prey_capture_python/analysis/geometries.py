@@ -4,8 +4,29 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import interpolate
 from scipy import signal
+from typing import List, Union
 
-def azimuth_from_center(mouse_xy, headbase_xy, cricket_xy):
+def relentless_positivity(df: pd.DataFrame, column:str, window: int = 20, threshold: float = 0.95,tolist:bool = True) -> Union[List[List[int]], np.ndarray]:
+    """
+    Find ranges where column is above threshold for #window number of rows
+
+    Returns:
+        List of Lists indicating the start and end of positive ranges
+    """
+    inds=np.where(df[column].rolling(window).sum()>=threshold*window)[0]
+    starts=inds[np.diff(inds, prepend=-1)!=1]-window+1
+    ends=inds[np.diff(inds, append=-1)!=1]
+    periods=np.column_stack([starts, ends])
+    start=np.min(periods)
+    print(start)
+    end=np.max(periods)
+    print(end)
+    if tolist:
+        return periods.tolist(), start, end
+    else:
+        return periods, start, end
+
+def azimuth_from_center(mouse_xy, headbase_xy, cricket_xy, start, end):
     """
     Function to calculate the angle between the mouse and the cricket, azimuth,
     using the center of mass of the mouse. This is based on the Matlab code used
@@ -33,7 +54,7 @@ def azimuth_from_center(mouse_xy, headbase_xy, cricket_xy):
         az=(az*180)/np.pi
     return az
 
-def speed(xy, win:int=12, fr:int=200):
+def speed(xy, start, end, win:int=12, fr:int=200):
     """
     Function used to calculate speeds during the prey capture trial. Can be used
     for either mouse or cricket speeds.
@@ -53,7 +74,7 @@ def speed(xy, win:int=12, fr:int=200):
     spd = (np.sqrt(np.square(dx)+np.square(dy)))*fr
     return spd
 
-def distance(xy1, xy2):
+def distance(xy1, xy2, start, end):
     """
     Function used to calculate speeds during the prey capture trial. Can be used
     for either mouse or cricket speeds.
@@ -63,7 +84,7 @@ def distance(xy1, xy2):
 
     Returns:
         dist (:class:`numpy.ndarray`): an array containing distance between two
-            objects over time 
+            objects over time
     """
     dist = np.sqrt(np.square(xy1[0]- xy2[0]) + np.square(xy1[1] - xy2[1]))
     dist[-1]=0 #we can think about if we want this but last point should be the capture?
@@ -74,19 +95,19 @@ def distance(xy1, xy2):
     dist = range_interp
     return dist
 
-def azimuth_from_ears(mouse_xy, cricket_xy, rear_xy, lear_xy):
-        """
-        Function used to calculate angle between mouse and the cricket, azimuth,
-        using the ears and center of the head. Based on calculations used for
-        azimuth in the Niell Lab.
-        Arguments:
-            mouse_xy (:class:`numpy.ndarray`): an n x 2 array of coordinates over time
-            cricket_xy (:class:`numpy.ndarray`): an n x 2 array of coordinates over time
-            headbase_xy (:class:`numpy.ndarray`): an n x 2 array of coordinates over time
+def azimuth_from_ears(mouse_xy, cricket_xy, rear_xy, lear_xy, start, end):
+    """
+    Function used to calculate angle between mouse and the cricket, azimuth,
+    using the ears and center of the head. Based on calculations used for
+    azimuth in the Niell Lab.
+    Arguments:
+        mouse_xy (:class:`numpy.ndarray`): an n x 2 array of coordinates over time
+        cricket_xy (:class:`numpy.ndarray`): an n x 2 array of coordinates over time
+        headbase_xy (:class:`numpy.ndarray`): an n x 2 array of coordinates over time
 
-        Returns:
-            az (:class:`numpy.ndarray`): an array containing azimuth values over time
-        """
+    Returns:
+        az (:class:`numpy.ndarray`): an array containing azimuth values over time
+    """
     #calculate azimuth
     #right now goes from -180 to 180 to show the direction, but this can cause large jumps in the plotting
     #could shift it to just going from 0 to 180 and indicate which direction the mouse is some other way
@@ -102,7 +123,7 @@ def azimuth_from_ears(mouse_xy, cricket_xy, rear_xy, lear_xy):
         az = interp(ind)
     return az
 
-def geometries(cricket_xy, mouse_xy, rear_xy, lear_xy, headbase_xy, fr=200):
+def geometries(cricket_xy, mouse_xy, rear_xy, lear_xy, headbase_xy, cricket_p, fr=200):
     '''
     function to calculate geometric variables from DLC points
     these geometries can then be used for metrics such as time to capture
@@ -111,6 +132,7 @@ def geometries(cricket_xy, mouse_xy, rear_xy, lear_xy, headbase_xy, fr=200):
 
     Arguments:
         cricket_xy (:class:`numpy.ndarray`) : thresholded cricket xy coordinates
+        cricket_p (:class:`numpy.ndarray`) : cricket probability values
         mouse_xy (:class:`numpy.ndarray`) : mouse xy coordinates
         rear_xy (:class:`numpy.ndarray`) : xy coordinates of right ear, needed for azimuth calc
         lear_xy (:class:`numpy.ndarray`) : xy coordinates of left ear, needed for azimuth calc
@@ -122,16 +144,20 @@ def geometries(cricket_xy, mouse_xy, rear_xy, lear_xy, headbase_xy, fr=200):
         cricket_spd (:class:`numpy.ndarray`): cricket speed
         az (:class:`numpy.ndarray`): azimuth (angle of mouse head to cricket)
     '''
+    #find period of the video where the cricket was present for interpolation
+    df = pd.DataFrame({'data':cricket_p})
+    periods, start, end  = relentless_positivity(df, 'data')
+
     #calculate the distance between the mouse and cricket
-    range = distance(circket_xy, mouse_xy)
+    range = distance(cricket_xy, mouse_xy, start, end)
 
     #calculate mouse speed, can add to this later to do velocity in x and y
-    mouse_spd = speed(mouse_xy)
-    cricket_spd = speed(cricket_xy)
+    mouse_spd = speed(mouse_xy, start, end)
+    cricket_spd = speed(cricket_xy, start, end)
 
     #probably need to do some interpolation on these values, but not sure how well this would work right now
     #not sure which value above comment is referring to
 
-    az  = azimuth_from_center(mouse_xy, headbase_xy, cricket_xy)
+    az  = azimuth_from_center(mouse_xy, headbase_xy, cricket_xy, start, end)
 
     return range, mouse_spd, cricket_spd, az
