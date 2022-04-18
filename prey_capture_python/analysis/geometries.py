@@ -18,9 +18,9 @@ def relentless_positivity(df: pd.DataFrame, column:str, window: int = 20, thresh
     ends=inds[np.diff(inds, append=-1)!=1]
     periods=np.column_stack([starts, ends])
     start=np.min(periods)
-    print(start)
+    # print(start)
     end=np.max(periods)
-    print(end)
+    # print(end)
     if tolist:
         return periods.tolist(), start, end
     else:

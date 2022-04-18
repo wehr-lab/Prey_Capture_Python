@@ -54,9 +54,9 @@ def preycap_metrics(cricket_xy, cricket_p, range, mouse_spd, az, fr=200, oldmode
             df = pd.DataFrame({'data':cricket_p})
             periods = relentless_positivity(df, 'data')
             start=np.min(periods)
-            print(start)
+            # print(start)
             end=np.max(periods)
-            print(end)
+            # print(end)
             captureT=(end-start)/fr
         if captureT.size==0:
             captureT=movieT
