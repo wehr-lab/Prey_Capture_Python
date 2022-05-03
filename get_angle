@@ -1,0 +1,35 @@
+import numpy as np
+from numpy import linalg as la
+
+def get_angle(centerpt, refpt, measurept):
+    '''
+    Function to get any angle you want.
+
+    Args:
+        centerpt (:class:`numpy.ndarray`) : nx2 array, position of center point
+            of your choice, i.e. midpoint of ears, back of head.
+        refpt (:class:`numpy.ndarray`) : nx2 array, position of reference point
+            of your choice, i.e. the nose in this case.
+        measurept (:class:`numpy.ndarray`) : nx2 array, position of the cricket.
+
+    Returns:
+        angle (:class:`numpy.ndarray`): nx1 array of angles across time
+    '''
+
+    #match lenght of arbitrary points chosen for ref or center point
+    maxmeasure=np.max()
+
+    #calculate the normalized vectors for getting the angle
+    #possibly get all of this into a df
+    n1=(measurept-centerpt)/la.norm((measurept-centerpt))
+    n2=(refpt-centerpt)/la.norm((refpt-centerpt))
+
+    #use arctan to get the angle at every point in time
+    angle=np.empty([maxmeasure,1], dtype=float)
+    counter=0
+    for i in range(0,maxmeasure):
+        angle[i,:] = np.arctan2(la.norm(la.det((n2[i,:], n1[i,:]))), np.dot(n1[i,:], n2[i,:]))
+        counter +=1
+    #determine if angle is to the right or left
+
+    return angle
