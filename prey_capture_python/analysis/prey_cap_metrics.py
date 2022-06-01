@@ -88,14 +88,17 @@ def preycap_metrics(cricket_xy, cricket_p, range, mouse_spd, az, fr=200, oldmode
         maybeIntercept = np.take(range[start:end], approachEnds) # uses approachEnds to index range
         maybeIntercept = maybeIntercept[0] # np.take returns tuple, first value are the ones you one
         #print(maybeIntercept)
-        maybeIntercept[-1] = 0 # assuming last approach is intercept/capture, makes things werk
+        maybeIntercept[-1] = 0 # assuming last approach is intercept/capture, makes things werk, this needs to be changed, last intercept might not be a capture
 
         for i in maybeIntercept:
             if i < 5:
                 intercept.append(1)
             else:
                 intercept.append(0)
-
+        # find the first intercept for sake of calculating latency to intercept not approach
+        # hope is that this will be closer to the latency to attack values used in Zhao et al 2019
+        firstintercept= np.min(intercept>0)
+        timetointercept=firstintercept/fr  #return this
         # calculate probability of intercept given approach
         tot_approach = np.size(approachEnds)
         #print(tot_approach)
@@ -109,4 +112,4 @@ def preycap_metrics(cricket_xy, cricket_p, range, mouse_spd, az, fr=200, oldmode
         else:
             print('no capture')
 
-        return approach, captureT, freqapproach, timetoapproach, prob_inter, prob_capture
+        return approach, captureT, freqapproach, timetoapproach, timetointercept, prob_inter, prob_capture
