@@ -98,7 +98,7 @@ def preycap_metrics(cricket_xy, cricket_p, range, mouse_spd, az, fr=200, oldmode
         # find the first intercept for sake of calculating latency to intercept not approach
         # hope is that this will be closer to the latency to attack values used in Zhao et al 2019
         firstintercept= np.where(intercept>0)[0][0]
-        timetointercept=approachEnds[firstintercept][0]/fr  #return this
+        timetointercept=approachEnds[0][firstintercept]/fr  #return this
 
         # calculate probability of intercept given approach
         tot_approach = np.size(approachEnds)
