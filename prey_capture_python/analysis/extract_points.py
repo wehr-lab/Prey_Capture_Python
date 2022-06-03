@@ -27,7 +27,7 @@ def getmidpoint(pt1,pt2):
     midpoint=0.5*(pt1+pt2)
     return midpoint
 
-def extract_points(file, bodyparts, fr=200, pix2cm=15.8, thresh=0.7 ):
+def extract_points(file, bodyparts, fr=200, pix2cm=15.8, thresh=0.7, startonly=False ):
     '''
     function to extract mouse and cricket xy positions from DLC output csv
     will also get the likelihood values for cricket positions
@@ -40,6 +40,7 @@ def extract_points(file, bodyparts, fr=200, pix2cm=15.8, thresh=0.7 ):
         fr (int): framerate of videos, default=200
         pix2cm (int): conversion from pixels to cm, default=15.8 (needs to be checked)
         thresh (int): threshold for likelihood values, default=0.7
+        startonly (bool): flag to only include the first 2min in calculations so laser is always on
 
 
     Returns:
@@ -51,8 +52,11 @@ def extract_points(file, bodyparts, fr=200, pix2cm=15.8, thresh=0.7 ):
     #set the constant values that will be used throughout
     #load relevant dlc points from the csv, limits the amount you have to work with
     data=pd.read_csv(file, skiprows=[0,1], header=[0,1])
-    data=data.loc[:, bodyparts]
-
+    if startonly==False:
+        data=data.loc[:,bodyparts]
+    else:
+        data=data.loc[:,bodyparts]
+        data=data.iloc[0:(120*fr)]
     #create 2d array for mouse xy coordinates
     #right now indexing df depends on order of your bodyparts lists, find a better way to deal with this
     rear_x=data[bodyparts[0],'x'].to_numpy()
