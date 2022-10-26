@@ -4,36 +4,49 @@ import os
 import pandas as pd
 import numpy as np
 import prey_capture_python as preycap
+import glob
 
 # %% testing loading in file names and converting to posix + finding csv
-mollys_hell = pd.read_csv("/mnt/rig4/lab/djmaus/Data/Molly/MollysHell_All.csv")
-new_stem = "/mnt/ion-nas/Rig4/Molly/ZIActivation"
+mollys_hell = pd.read_csv("/Volumes/Projects/PreyCapture/ZIActivation/DataDirs.csv")
+new_stem = "/Volumes/Projects/PreyCapture/ZIActivation/"
+# print(new_stem)
 result_frame = pd.DataFrame(dtype="object")
 list_of_failed_mice = []
 list_of_weird_mice = []
 
 for i, row in mollys_hell.iterrows():
-    file = row["SelectedFolders"]
+    file = row["path"]
+    # print(file)
     path_parts = list(pl.PureWindowsPath(file).parts)
     path_parts = [path_parts[-1]]
-    path_parts.insert(0, new_stem)
+    # print(path_parts)
+    for path in path_parts:
+        # print(path)
+        path=str(new_stem+path)
+        # print(path)
+        ext='csv'
+        os.chdir(path)
+        try:
+            csv=glob.glob('*_filtered.{}'.format(ext))
+            csv=str(csv[0])
+            # print(csv)
+            posix_csv_path=str(path+'/'+csv)
+            # print(posix_csv_path)
+        except IndexError:
+            posix_csv_path=np.nan
+
     path_parts_og = deepcopy(path_parts)
-    path_parts.append(row["Var4"])
-    try:
-        posix_csv_path = pl.Path(*path_parts)
-    except TypeError:
-        posix_csv_path = np.nan
+
     mollys_hell.at[i, "posix_csv_path"] = posix_csv_path
+    # print(posix_csv_path)
     folder_path = pl.Path(*path_parts_og)
     # Do we want to replace SelectedFolders with Posix path instead of Windows?
-    # print(posix_csv_path)
     if posix_csv_path is not np.nan:
         mouse_xy, cricket_p, cricket_xy, rear_xy, lear_xy, headbase_xy = preycap.extract_points(posix_csv_path,
                                                                                                 ['Rear', 'Lear',
                                                                                                  'anteriorC',
                                                                                                  'posteriorC',
-                                                                                                 'headbase'],
-                                                                                                startonly=True)
+                                                                                                 'headbase'])
         # Cricket variables above give NaNs for this csv
         try:
             dist, cricket_spd, mouse_spd, az = preycap.geometries(mouse_xy, cricket_xy, rear_xy, lear_xy, headbase_xy,
@@ -51,8 +64,9 @@ for i, row in mollys_hell.iterrows():
 
             result_frame.at[i, "filename"] = posix_csv_path
             result_frame.at[i, "folder_path"] = folder_path
-            result_frame.at[i, "condition"] = row["Condition_T"]
-            result_frame.at[i, "laser_value"] = row["LaserValues_T"]
+            result_frame.at[i, "condition"] = row["Cond"]
+            result_frame.at[i, "laser_value"] = row["Laser"]
+            result_frame.at[i, "circle"] = row["Circ"]
             result_frame.at[i, "dist"] = dist.astype("object")
             result_frame.at[i, "cricket_spd"] = cricket_spd.astype("object")
             result_frame.at[i, "mouse_spd"] = mouse_spd.astype("object")
@@ -75,9 +89,9 @@ for i, row in mollys_hell.iterrows():
             list_of_weird_mice.append([mouse, posix_csv_path])
             print("trial {} likely has no finish for approach. please manually check".format(mouse))
 
-result_frame.to_hdf("/home/lab/Desktop/20220603alltrials_start_LD.h5", key="df")
+result_frame.to_hdf("/Users/mollyshallow/Desktop/20221011_allmice_alltrials_LD_01.h5", key="df")
 print(list_of_failed_mice)
 mice_to_save = pd.DataFrame(data=list_of_failed_mice)
-mice_to_save.to_csv("/home/lab/Desktop/20220603_failed_mice.csv")
+mice_to_save.to_csv("/Users/mollyshallow/Desktop/20221011_failed_mice_01.csv")
 print(len(list_of_failed_mice))
 print(list_of_weird_mice)
