@@ -52,15 +52,15 @@ for i, row in mollys_hell.iterrows():
             dist, cricket_spd, mouse_spd, az = preycap.geometries(mouse_xy, cricket_xy, rear_xy, lear_xy, headbase_xy,
                                                                   cricket_p)
             try:
-                approach, captureT, freqapproach, timetoapproach, timetointercept, prob_inter, prob_capture = preycap.preycap_metrics(
+                end, approach, captureT, freqapproach, timetoapproach, interceptindex, timetointercept, prob_inter, prob_capture= preycap.preycap_metrics(
                     cricket_xy,
                     cricket_p, dist,
                     mouse_spd, az,
                     oldmodel=False)
             except IndexError:
-                approach, captureT, freqapproach, timetoapproach, timetointercept, prob_inter, prob_capture = [0, 0, 0,
+                end, approach, captureT, freqapproach, timetoapproach, interceptindex, timetointercept, prob_inter, prob_capture= [0, 0, 0,
                                                                                                                0, 0, 0,
-                                                                                                               0]
+                                                                                                               0, 0, 0]
 
             result_frame.at[i, "filename"] = posix_csv_path
             result_frame.at[i, "folder_path"] = folder_path
@@ -72,26 +72,28 @@ for i, row in mollys_hell.iterrows():
             result_frame.at[i, "mouse_spd"] = mouse_spd.astype("object")
             result_frame.at[i, "az"] = az.astype("object")
             result_frame.at[i, "captureT"] = captureT
+            # result_frame.at[i, "captureframe"] = end
             result_frame.at[i, "freqapproach"] = freqapproach
             result_frame.at[i, "timetoapproach"] = timetoapproach
             result_frame.at[i, "prob_inter"] = prob_inter
             result_frame.at[i, "prob_capture"] = prob_capture
             result_frame.at[i, "timetointercept"] = timetointercept
+            # result_frame.at[i, "interceptframe"] = interceptindex
 
-        except ValueError:
-            clip = path_parts[-1]
-            mouse = clip.split("DLC")[0]
-            list_of_failed_mice.append([mouse, posix_csv_path])
-            print("trial {} likely has no cricket. Please manually check".format(mouse))
+        # except ValueError:
+        #     clip = path_parts[-1]
+        #     mouse = clip.split("DLC")[0]
+        #     list_of_failed_mice.append([mouse, posix_csv_path])
+        #     print("trial {} likely has no cricket. Please manually check".format(mouse))
         except IndexError:
             clip = path_parts[-1]
             mouse = clip.split("DLC")[0]
             list_of_weird_mice.append([mouse, posix_csv_path])
             print("trial {} likely has no finish for approach. please manually check".format(mouse))
 
-result_frame.to_hdf("/Users/mollyshallow/Desktop/20221011_allmice_alltrials_LD_01.h5", key="df")
+result_frame.to_hdf("/Users/mollyshallow/Desktop/20221027_allmice_alltrials_LD.h5", key="df")
 print(list_of_failed_mice)
 mice_to_save = pd.DataFrame(data=list_of_failed_mice)
-mice_to_save.to_csv("/Users/mollyshallow/Desktop/20221011_failed_mice_01.csv")
+mice_to_save.to_csv("/Users/mollyshallow/Desktop/20221027_failed_mice.csv")
 print(len(list_of_failed_mice))
 print(list_of_weird_mice)
