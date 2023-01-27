@@ -114,4 +114,4 @@ def preycap_metrics(cricket_xy, cricket_p, range, mouse_spd, az, fr=200, oldmode
         else:
             print('no capture')
 
-        return end, approach, captureT, freqapproach, timetoapproach, interceptindex, timetointercept, prob_inter, prob_capture
+        return start, end, approach, captureT, freqapproach, timetoapproach, interceptindex, timetointercept, prob_inter, prob_capture

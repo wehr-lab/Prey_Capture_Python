@@ -82,6 +82,9 @@ def extract_points(file, bodyparts, fr=200, pix2cm=15.8, thresh=0.7, startonly=F
     cricket_x=(data[bodyparts[2],'x'].to_numpy()+data[bodyparts[3],'x'].to_numpy())/(2*pix2cm)
     cricket_y=(data[bodyparts[2],'y'].to_numpy()+data[bodyparts[3],'y'].to_numpy())/(2*pix2cm)
 
+    cricket_front=data[bodyparts[2].to_numpy()
+    cricket_back=data[bodyparts[3].to_numpy()
+
     thresh_cricket_x=cricket_x.copy()
     thresh_cricket_x[cricket_p<thresh]=np.nan
     thresh_cricket_y=cricket_y.copy()
@@ -89,4 +92,4 @@ def extract_points(file, bodyparts, fr=200, pix2cm=15.8, thresh=0.7, startonly=F
 
     cricket_xy=[thresh_cricket_x, thresh_cricket_y]
 
-    return mouse_xy, cricket_p, cricket_xy, rear_xy, lear_xy, headbase_xy
+    return mouse_xy, cricket_p, cricket_xy, rear_xy, lear_xy, headbase_xy, cricket_front, cricket_back

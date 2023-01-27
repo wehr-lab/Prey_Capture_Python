@@ -123,7 +123,19 @@ def azimuth_from_ears(mouse_xy, cricket_xy, rear_xy, lear_xy, start, end):
         az = interp(ind)
     return az
 
-def geometries(cricket_xy, mouse_xy, rear_xy, lear_xy, headbase_xy, cricket_p, fr=200):
+def length(cricket_front, cricket_back):
+    xy_length=np.abs(cricket_front-cricket_back)
+    xy_length
+
+    length=np.nanmean(xy_length, axis=0)
+    x_length=length[0]
+    y_length=length[1]
+
+    mean_length=(x_length+y_length)/2
+
+    return mean_length
+
+def geometries(cricket_xy, mouse_xy, rear_xy, lear_xy, headbase_xy, cricket_p, cricket_front, cricket_back, fr=200):
     '''
     function to calculate geometric variables from DLC points
     these geometries can then be used for metrics such as time to capture
@@ -160,4 +172,7 @@ def geometries(cricket_xy, mouse_xy, rear_xy, lear_xy, headbase_xy, cricket_p, f
 
     az  = azimuth_from_center(mouse_xy, headbase_xy, cricket_xy, start, end)
 
-    return range, mouse_spd, cricket_spd, az
+    #calculate the cricket length to bin data based on thresholds of cricket size
+    c_length=length(cricket_front, cricket_back)
+
+    return range, mouse_spd, cricket_spd, az, c_length
