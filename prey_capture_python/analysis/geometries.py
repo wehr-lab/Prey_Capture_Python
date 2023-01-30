@@ -127,7 +127,7 @@ def length(cricket_front, cricket_back):
     xy_length=np.abs(cricket_front-cricket_back)
     xy_length
 
-    length=np.nanmean(xy_length, axis=0)
+    length=np.nanmedian(xy_length, axis=0)
     x_length=length[0]
     y_length=length[1]
 

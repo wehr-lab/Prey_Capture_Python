@@ -50,7 +50,7 @@ for i, row in mollys_hell.iterrows():
         # Cricket variables above give NaNs for this csv
         try:
             dist, cricket_spd, mouse_spd, az, c_length = preycap.geometries(mouse_xy, cricket_xy, rear_xy, lear_xy, headbase_xy,
-                                                                  cricket_p, cricket_font, cricket_back)
+                                                                  cricket_p, cricket_front, cricket_back)
             try:
                 start, end, approach, captureT, freqapproach, timetoapproach, interceptindex, timetointercept, prob_inter, prob_capture= preycap.preycap_metrics(
                     cricket_xy,
@@ -93,9 +93,9 @@ for i, row in mollys_hell.iterrows():
             list_of_weird_mice.append([mouse, posix_csv_path])
             print("trial {} likely has no finish for approach. please manually check".format(mouse))
 
-result_frame.to_hdf("/Users/mollyshallow/Desktop/20221028_allmice_alltrials_LD.h5", key="df")
+result_frame.to_hdf("/Users/mollyshallow/Desktop/20230127_allmice_alltrials_LD.h5", key="df")
 print(list_of_failed_mice)
 mice_to_save = pd.DataFrame(data=list_of_failed_mice)
-mice_to_save.to_csv("/Users/mollyshallow/Desktop/20221028_failed_mice.csv")
+mice_to_save.to_csv("/Users/mollyshallow/Desktop/20230127_failed_mice.csv")
 print(len(list_of_failed_mice))
 print(list_of_weird_mice)
