@@ -165,8 +165,10 @@ def geometries(cricket_xy, mouse_xy, rear_xy, lear_xy, headbase_xy, cricket_p, c
 
     #calculate mouse speed, can add to this later to do velocity in x and y
     mouse_spd = speed(mouse_xy, start, end)
+    mouse_spd = np.append(mouse_spd, np.nan)
+    
     cricket_spd = speed(cricket_xy, start, end)
-
+    cricket_spd = np.append(cricket_spd, np.nan)
     #probably need to do some interpolation on these values, but not sure how well this would work right now
     #not sure which value above comment is referring to
 
