@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-
+import matplotlib.pyplot as plt
 # from dataclasses import dataclass
 # from typing import List, Literal
 # from pathlib import Path
@@ -51,6 +51,7 @@ def extract_points(file, bodyparts, fr=200, pix2cm=15.8, thresh=0.7, startonly=F
     '''
     #set the constant values that will be used throughout
     #load relevant dlc points from the csv, limits the amount you have to work with
+    # print(bodyparts)
     data=pd.read_csv(file, skiprows=[0,1], header=[0,1])
     if startonly==False:
         data=data.loc[:,bodyparts]
@@ -60,13 +61,21 @@ def extract_points(file, bodyparts, fr=200, pix2cm=15.8, thresh=0.7, startonly=F
     #create 2d array for mouse xy coordinates
     #right now indexing df depends on order of your bodyparts lists, find a better way to deal with this
     rear_x=data[bodyparts[0],'x'].to_numpy()
+    # plt.plot(rear_x)
     rear_y=data[bodyparts[0],'y'].to_numpy()
+    # plt.plot(rear_y)
 
     lear_x=data[bodyparts[1],'x'].to_numpy()
+    # plt.plot(lear_x)
     lear_y=data[bodyparts[1],'y'].to_numpy()
+    # plt.plot(lear_y)
 
     rear_xy=np.asarray([rear_x,rear_y])
+    # plt.figure(figsize=(10,10))
+    # plt.plot(rear_xy[0], rear_xy[1])
     lear_xy=np.asarray([lear_x,lear_y])
+    # plt.figure(figsize=(10,10))
+    # plt.plot(lear_xy[0], lear_xy[1])
 
     headbase_x=data[bodyparts[4],'x'].to_numpy()
     headbase_y=data[bodyparts[4],'y'].to_numpy()
@@ -74,13 +83,19 @@ def extract_points(file, bodyparts, fr=200, pix2cm=15.8, thresh=0.7, startonly=F
 
 
     mouse_xy=getmidpoint(rear_xy,lear_xy)/pix2cm
+    # plt.figure(figsize=(10,10))
+    # plt.plot(mouse_xy[0],mouse_xy[1])
 
     #extract cricket likelihood and xy coordinates, same indexing issue
     #average function?
     cricket_p=(data[bodyparts[2],'likelihood'].to_numpy()+data[bodyparts[3],'likelihood'].to_numpy())/2
     #add pvalues to the same array as xy
     cricket_x=(data[bodyparts[2],'x'].to_numpy()+data[bodyparts[3],'x'].to_numpy())/(2*pix2cm)
+    # plt.figure(figsize=(10,10))
+    # plt.plot(cricket_x)
     cricket_y=(data[bodyparts[2],'y'].to_numpy()+data[bodyparts[3],'y'].to_numpy())/(2*pix2cm)
+    # plt.figure(figsize=(10,10))
+    # plt.plot(cricket_y)
 
     cricket_front=data[bodyparts[2]].to_numpy()
     cricket_back=data[bodyparts[3]].to_numpy()
@@ -91,5 +106,7 @@ def extract_points(file, bodyparts, fr=200, pix2cm=15.8, thresh=0.7, startonly=F
     thresh_cricket_y[cricket_p<thresh]=np.nan
 
     cricket_xy=[thresh_cricket_x, thresh_cricket_y]
+    # plt.figure(figsize=(10,10))
+    # plt.plot(cricket_xy[0], cricket_xy[1],linestyle="", marker='.', markersize=1)
 
     return mouse_xy, cricket_p, cricket_xy, rear_xy, lear_xy, headbase_xy, cricket_front, cricket_back

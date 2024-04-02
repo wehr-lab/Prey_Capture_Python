@@ -7,12 +7,13 @@ import prey_capture_python as preycap
 import glob
 
 # %% testing loading in file names and converting to posix + finding csv
-mollys_hell = pd.read_csv("/Volumes/Projects/PreyCapture/ZIActivation/DataDirs.csv")
+mollys_hell = pd.read_csv("/Volumes/Projects/PreyCapture/ZIActivation/DataDirs_newcohort_wdrops.csv")
 new_stem = "/Volumes/Projects/PreyCapture/ZIActivation/"
 # print(new_stem)
 result_frame = pd.DataFrame(dtype="object")
 list_of_failed_mice = []
 list_of_weird_mice = []
+list_of_nofilter =[]
 
 for i, row in mollys_hell.iterrows():
     file = row["path"]
@@ -24,16 +25,30 @@ for i, row in mollys_hell.iterrows():
         # print(path)
         path=str(new_stem+path)
         # print(path)
-        ext='csv'
+        # ext='csv'
         os.chdir(path)
         try:
-            csv=glob.glob('*_filtered.{}'.format(ext))
-            csv=str(csv[0])
+            csv=glob.glob('*_filtered.csv')
+            csv[0]
             # print(csv)
-            posix_csv_path=str(path+'/'+csv)
+            dates=[]
+            for j, file in enumerate(csv):
+                dates.append(pl.Path(str(file)).stat().st_mtime)
+            index=np.argmax(dates)
+            # print(index)
+            csv_new=csv[index]
+            # print(type(csv_new))
+            # csv=str(csv[0]
+            print(csv_new)
+            posix_csv_path=str(path+'/'+csv_new)
             # print(posix_csv_path)
+                # list_of_nofilter.append(path)
+                # print("{} likely has no filtered csv. please manually check".format(path))
         except IndexError:
             posix_csv_path=np.nan
+            list_of_nofilter.append(path)
+            print("{} likely has no filtered csv. please manually check".format(path))
+            # print('skipped')
 
     path_parts_og = deepcopy(path_parts)
 
@@ -66,11 +81,16 @@ for i, row in mollys_hell.iterrows():
             result_frame.at[i, "folder_path"] = folder_path
             result_frame.at[i, "condition"] = row["Cond"]
             result_frame.at[i, "laser_value"] = row["Laser"]
-            result_frame.at[i, "circle"] = row["Circ"]
+            result_frame.at[i, "trials_to_drop"] = row["trials_to_drop"]
             result_frame.at[i, "dist"] = dist.astype("object")
             result_frame.at[i, "cricket_spd"] = cricket_spd.astype("object")
             result_frame.at[i, "mouse_spd"] = mouse_spd.astype("object")
             result_frame.at[i, "az"] = az.astype("object")
+            # result_frame.at[i, "mouse_xy"] = mouse_xy.astype("object")
+            # result_frame.at[i, "rear_xy"] = rear_xy.astype("object")
+            # result_frame.at[i, "lear_xy"] = lear_xy.astype("object")
+            # result_frame.at[i, "headbase_xy"] = headbase_xy.astype("object")
+            # result_frame.at[i, "cricket_xy"] = cricket_xy.astype("object")
             result_frame.at[i, "captureT"] = captureT
             result_frame.at[i, "cricketdrop"] = start
             result_frame.at[i, "captureframe"] = end
@@ -93,9 +113,12 @@ for i, row in mollys_hell.iterrows():
             list_of_weird_mice.append([mouse, posix_csv_path])
             print("trial {} likely has no finish for approach. please manually check".format(mouse))
 
-result_frame.to_hdf("/Users/mollyshallow/Desktop/20230127_allmice_alltrials_LD.h5", key="df")
+result_frame.to_hdf("/Users/mollyshallow/Desktop/20230605_newcohort_LD.h5", key="df")
 print(list_of_failed_mice)
 mice_to_save = pd.DataFrame(data=list_of_failed_mice)
-mice_to_save.to_csv("/Users/mollyshallow/Desktop/20230127_failed_mice.csv")
+mice_to_save.to_csv("/Users/mollyshallow/Desktop/20230605_failed_newcohort.csv")
+nofilter_to_save = pd.DataFrame(data=list_of_nofilter)
+nofilter_to_save.to_csv("/Users/mollyshallow/Desktop/20230605_notfiltered_newcohort.csv")
+print(len(list_of_nofilter))
 print(len(list_of_failed_mice))
 print(list_of_weird_mice)

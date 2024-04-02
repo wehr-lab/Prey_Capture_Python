@@ -72,6 +72,12 @@ def speed(xy, start, end, win:int=12, fr:int=200):
     dy = np.diff(xy[1])
     dy = np.convolve(dy,np.ones(win)/win, 'same')
     spd = (np.sqrt(np.square(dx)+np.square(dy)))*fr
+
+    ind = np.arange(0,len(spd))
+    interp = interpolate.interp1d(ind[~np.isnan(spd)], spd[~np.isnan(spd)],bounds_error=False, fill_value=np.nan )
+    spd_interp = interp(ind)
+    spd = spd_interp
+
     return spd
 
 def distance(xy1, xy2, start, end):
@@ -166,7 +172,7 @@ def geometries(cricket_xy, mouse_xy, rear_xy, lear_xy, headbase_xy, cricket_p, c
     #calculate mouse speed, can add to this later to do velocity in x and y
     mouse_spd = speed(mouse_xy, start, end)
     mouse_spd = np.append(mouse_spd, np.nan)
-    
+
     cricket_spd = speed(cricket_xy, start, end)
     cricket_spd = np.append(cricket_spd, np.nan)
     #probably need to do some interpolation on these values, but not sure how well this would work right now
