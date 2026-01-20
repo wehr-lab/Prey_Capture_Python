@@ -7,9 +7,9 @@ import prey_capture_python as preycap
 import glob
 
 # %% testing loading in file names and converting to posix + finding csv
-mollys_hell = pd.read_csv("/Volumes/Projects/PreyCapture/ZIActivation/DataDirs_newcohort_wdrops.csv")
-new_stem = "/Volumes/Projects/PreyCapture/ZIActivation/"
-# print(new_stem)
+mollys_hell = pd.read_csv("/Volumes/Projects/PreyCapture/ZIActivation/ViralChR2_Activation/formatted_conditions_summary_reordered_viral.csv")
+new_stem = "/Volumes/Projects/PreyCapture/ZIActivation/ViralChR2_Activation/"
+print(new_stem)
 result_frame = pd.DataFrame(dtype="object")
 list_of_failed_mice = []
 list_of_weird_mice = []
@@ -17,7 +17,7 @@ list_of_nofilter =[]
 
 for i, row in mollys_hell.iterrows():
     file = row["path"]
-    # print(file)
+    print(file)
     path_parts = list(pl.PureWindowsPath(file).parts)
     path_parts = [path_parts[-1]]
     # print(path_parts)
@@ -113,12 +113,12 @@ for i, row in mollys_hell.iterrows():
             list_of_weird_mice.append([mouse, posix_csv_path])
             print("trial {} likely has no finish for approach. please manually check".format(mouse))
 
-result_frame.to_hdf("/Users/mollyshallow/Desktop/20230605_newcohort_LD.h5", key="df")
+result_frame.to_hdf("/Users/mollyshallow/Desktop/20250220_newcalcs_LD_januarycohort.h5", key="df")
 print(list_of_failed_mice)
 mice_to_save = pd.DataFrame(data=list_of_failed_mice)
-mice_to_save.to_csv("/Users/mollyshallow/Desktop/20230605_failed_newcohort.csv")
+mice_to_save.to_csv("/Users/mollyshallow/Desktop/20250220_failed.csv")
 nofilter_to_save = pd.DataFrame(data=list_of_nofilter)
-nofilter_to_save.to_csv("/Users/mollyshallow/Desktop/20230605_notfiltered_newcohort.csv")
+nofilter_to_save.to_csv("/Users/mollyshallow/Desktop/20250220_notfiltered.csv")
 print(len(list_of_nofilter))
 print(len(list_of_failed_mice))
 print(list_of_weird_mice)

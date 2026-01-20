@@ -99,7 +99,9 @@ def preycap_metrics(cricket_xy, cricket_p, range, mouse_spd, az, fr=200, oldmode
         # hope is that this will be closer to the latency to attack values used in Zhao et al 2019
         firstintercept= np.where(intercept>0)[0][0]
         interceptindex=approachEnds[0][firstintercept] #return this
+	#this time to intercept is just time from the start of the video not while the cricket is present
         timetointercept=approachEnds[0][firstintercept]/fr  #return this
+	#cricket drop was calculated outside of this script so can do corrected timetointercept without re-running opto metrics 
 
         # calculate probability of intercept given approach
         tot_approach = np.size(approachEnds)
